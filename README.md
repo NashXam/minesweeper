@@ -35,12 +35,6 @@ HS:12       CS:00
 | | | | | | | | |
 | | | | | | | | |
 
-GIVEN a new game
-WHEN I tap anywhere on the game board
-THEN a random tile that contains no mine is selected and
-     each neighboring tile is labeled with a digit indicating the number of adajent mines and
-     the game is being played
-
 GIVEN a game being played
 WHEN I long-tap an empty tile that contains no mine
 THEN the tapped tile changes color to shows it's clear and
