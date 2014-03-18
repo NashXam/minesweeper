@@ -39,6 +39,7 @@ GIVEN a game being played
 WHEN I long-tap an empty tile that contains no mine
 THEN the tapped tile changes color to shows it's clear and
      each neighboring tile is labeled with a digit indicating the number of adajent mines and
+     all tiles that would be labeled with 0 are cleared (cascading behavior
      current score is incremented by 1 and
      high score is set to current score if current score is greater
 
