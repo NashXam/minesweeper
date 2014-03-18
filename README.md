@@ -35,46 +35,46 @@ HS:12       CS:00
 | | | | | | | | |
 | | | | | | | | |
 
-GIVEN a "new" game
+GIVEN a new game
 WHEN I tap anywhere on the game board
 THEN a random tile that contains no mine is selected and
      each neighboring tile is labeled with a digit indicating the number of adajent mines and
-     the game is "being played"
+     the game is being played
 
-GIVEN a game "being played"
+GIVEN a game being played
 WHEN I long-tap an empty tile that contains no mine
 THEN the tapped tile changes color to shows it's clear and
      each neighboring tile is labeled with a digit indicating the number of adajent mines and
      current score is incremented by 1 and
      high score is set to current score if current score is greater
 
-GIVEN a game "being played"
+GIVEN a game being played
 WHEN I long-tap a tile that contains a mine
 THEN you lose! and
-     the game is "over"
+     the game is over
 
-GIVEN a game "being played"
+GIVEN a game being played
 WHEN I long-tap the last empty tile that contains no mine
 THEN you win! and
-     the game is "over"
+     the game is over
 
-GIVEN a game "being played"
+GIVEN a game being played
 WHEN I tap an empty tile
 THEN the tapped tile is flagged
 
-GIVEN a game "being played"
+GIVEN a game being played
 WHEN I tap a flagged tile
 THEN the tapped tile is emptied
 
-GIVEN a game "being played" or "over"
+GIVEN a game being played or over
 WHEN I shake the device
 THEN all tiles are emptied and
-     a "new" game is started and
+     a new game is started and
      current score is set to 0
 
 GIVEN a game that is "over"
 WHEN I tap anywhere on the game board
 THEN all tiles are emptied and
-     a "new" game is started and
+     a new game is started and
      current score is set to 0
 ````
