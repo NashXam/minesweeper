@@ -7,6 +7,11 @@ namespace Minesweeper
 {
 	public partial class MinesweeperViewController : UIViewController
 	{
+		private static int NUMROWS = 8;
+		private static int NUMCOLS = 8;
+
+		private UIImageView[,] tile = new UIImageView[NUMCOLS, NUMROWS];
+
 		public MinesweeperViewController () : base ("MinesweeperViewController", null)
 		{
 		}
@@ -23,7 +28,17 @@ namespace Minesweeper
 		{
 			base.ViewDidLoad ();
 			
-			// Perform any additional setup after loading the view, typically from a nib.
+			for (int col = 0; col < NUMCOLS; col++) {
+				for (int row = 0; row < NUMROWS; row++) {
+					tile [col, row] = (UIImageView)this.View.ViewWithTag (CoordsToTag(col, row));
+				}
+			}
+
+		}
+
+		private int CoordsToTag(int col, int row)
+		{
+			return (col * 10) + row;
 		}
 	}
 }
