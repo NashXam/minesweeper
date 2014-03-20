@@ -93,6 +93,17 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\Default-568h%402x.png" />
+    <BundleResource Include="Resources\tile.png" />
+    <BundleResource Include="Resources\bomb.png" />
+    <BundleResource Include="Resources\one.png" />
+    <BundleResource Include="Resources\blank.png" />
+    <BundleResource Include="Resources\two.png" />
+    <BundleResource Include="Resources\eight.png" />
+    <BundleResource Include="Resources\seven.png" />
+    <BundleResource Include="Resources\six.png" />
+    <BundleResource Include="Resources\five.png" />
+    <BundleResource Include="Resources\four.png" />
+    <BundleResource Include="Resources\three.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
