@@ -104,6 +104,9 @@
     <BundleResource Include="Resources\five.png" />
     <BundleResource Include="Resources\four.png" />
     <BundleResource Include="Resources\three.png" />
+    <BundleResource Include="Resources\flag.png" />
+    <BundleResource Include="Resources\covered.png" />
+    <BundleResource Include="Resources\flagged.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -116,6 +119,7 @@
     <Compile Include="MinesweeperViewController.designer.cs">
       <DependentUpon>MinesweeperViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="MineSweeperGame.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MinesweeperViewController.xib" />

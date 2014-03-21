@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Timers;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
@@ -17,23 +18,24 @@ namespace Minesweeper
 
 		private static int NUMMINES = 10;
 
-		private static int MINE = 0xFFFF;
+		private static int SHORTPRESS = 0;
+		private static int LONGPRESS = 1;
+
+		private MineSweeperGame game;
+		private Timer pressTimer;
+		private int pressType;
+		private int pressTag;
 
 		private int highScore = 0;
-		private int currentScore = 0;
 
-		private UIImageView[,] tile = new UIImageView[NUMCOLS, NUMROWS];
-		private Boolean[,] tileCovered = new Boolean[NUMCOLS, NUMROWS];
-		private Boolean[,] tileFlagged = new Boolean[NUMCOLS, NUMROWS];
-		private int[,] tileState = new int[NUMCOLS, NUMROWS];
+		private UIButton[,] tile = new UIButton[NUMCOLS, NUMROWS];
 
 		private UIImage blankTile;
 		private UIImage mineTile;
+		private UIImage flag;
+		private UIImage coveredTile;
+		private UIImage flaggedTile;
 		private UIImage[] numberTiles = new UIImage[9];
-
-		private Random random = new Random();
-
-		UILongPressGestureRecognizer longPressGestureRecognizer;
 
 		public MinesweeperViewController () : base ("MinesweeperViewController", null)
 		{
@@ -53,6 +55,9 @@ namespace Minesweeper
 
 			blankTile = UIImage.FromBundle ("tile.png");
 			mineTile = UIImage.FromBundle ("bomb.png");
+			flag = UIImage.FromBundle ("flag.png");
+			coveredTile = UIImage.FromBundle ("covered.png");
+			flaggedTile = UIImage.FromBundle ("flagged.png");
 
 			numberTiles[0] = UIImage.FromBundle ("blank.png");
 			numberTiles[1] = UIImage.FromBundle ("one.png");
@@ -66,151 +71,139 @@ namespace Minesweeper
 
 			for (int col = 0; col < NUMCOLS; col++) {
 				for (int row = 0; row < NUMROWS; row++) {
-					var frame = new RectangleF(STARTX + (col * (TILESIZE + GAPSIZE)), STARTY + (row * (TILESIZE + GAPSIZE)), TILESIZE, TILESIZE);
-					tile [col, row] = new UIImageView(frame);
+					var frame = new RectangleF (STARTX + (col * (TILESIZE + GAPSIZE)), STARTY + (row * (TILESIZE + GAPSIZE)), TILESIZE, TILESIZE);
+					UIButton iv = UIButton.FromType(UIButtonType.Custom);
+					iv.Frame = frame;
+					tile [col, row] = iv;
 					//tile [col, row].Image = mineTile;
-					tile [col, row].BackgroundColor = UIColor.White;
-					View.Add (tile [col, row]);
-					// Long press gesture
-					tile [col, row].AddGestureRecognizer(new UILongPressGestureRecognizer((UIGestureRecognizer r, UITouch t) => 
-					{
-						Debug.WriteLine("Long press.");
-						}));
-					 
+					iv.BackgroundColor = UIColor.White;
+					View.Add (iv);
+					iv.UserInteractionEnabled = true;
+					iv.Tag = TagForTile (col, row);
 
-				}
+					iv.TouchDown += (sender, ea) => {
+						pressTag = ((UIButton)sender).Tag;
+						flagImage.Image = flag;
+						pressTimer = new Timer(400);
+						pressTimer.Elapsed += OnTimerElapsed;
+						pressTimer.Start ();
+						pressType = SHORTPRESS;
+					};
+
+					iv.TouchUpInside += (sender, ea) => {
+						InvokeOnMainThread (() => flagImage.Image = blankTile);
+						if (pressTimer != null) {
+							pressTimer.Close();
+							pressTimer.Dispose();
+						}
+						HandlePress();
+					};
+
+					//iv.TouchesCancelled += (sender, ea) => {
+					//
+					//};
+
+					iv.TouchUpOutside += (sender, ea) => {
+						InvokeOnMainThread (() => flagImage.Image = blankTile);
+						if (pressTimer != null) {
+							pressTimer.Close();
+							pressTimer.Dispose();
+						}
+					};
+
+				}		 
 			}
 
+			// (UIGestureRecognizer r, UITouch t, Object o) 
 			StartGame (); 
+		}
+			
+		private void OnTimerElapsed (object o, EventArgs e)
+		{
+			InvokeOnMainThread (() => flagImage.Image = blankTile);
+			pressType = LONGPRESS;
+			pressTimer.Close();
+			pressTimer.Dispose();
+			pressTimer = null;
+		}
+
+		private void HandlePress()
+		{
+			if (pressType == SHORTPRESS) {
+				Point p = TileForTag (pressTag);
+				game.FlagTile (p.X, p.Y);
+			} else { // LONGPRESS
+				Point p = TileForTag (pressTag);
+				game.UncoverTile (p.X, p.Y);
+			}
 		}
 
 		private void StartGame()
 		{
-			// All tiles are covered
-			for (int col = 0; col < NUMCOLS; col++) {
-				for (int row = 0; row < NUMROWS; row++) {
-					tileCovered [col, row] = true;
-				}
-			}
+			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, (MineSweeperGame g) => {
+				ShowScore(g);
 
-			// Place the mines
-			int minesplaced = 0;
+				for (int col = 0; col < NUMCOLS; col++) {
+					for (int row = 0; row < NUMROWS; row++) {
+						int value = g.GetTileValue(col, row);
 
-			do {
-				Point p = RandomTile ();
+						MineSweeperGame.DrawType draw = g.GetDrawType(col, row);
 
-				int col = p.X;
-				int row = p.Y;
+						switch (draw) {
+						case MineSweeperGame.DrawType.Covered:
+							tile [col, row].SetImage(coveredTile, UIControlState.Normal);
+							break;
 
-					if (tileState[col, row] != MINE) {
-						tileState[col, row] = MINE;
-					minesplaced++;
-					tile [col, row].Image = mineTile;
-				}
-			} while (minesplaced < 10);
+						case MineSweeperGame.DrawType.Flagged:
+							tile [col, row].SetImage(flaggedTile, UIControlState.Normal);
+							break;
 
-			// Calculate numbers for each tile
-			for (int col = 0; col < NUMCOLS; col++) {
-				for (int row = 0; row < NUMROWS; row++) {
-					if (tileState [col, row] != MINE) {
-						int value = CalculateTileNumber (col, row);
-						tileState[col, row] = value;
-						tile [col, row].Image = numberTiles [value];
+						case MineSweeperGame.DrawType.Value:
+							tile [col, row].SetImage(numberTiles [value], UIControlState.Normal);
+							break;
+
+						case MineSweeperGame.DrawType.Mine:
+							tile [col, row].SetImage(mineTile, UIControlState.Normal);
+							break;
+						}
 					}
 				}
-			}
 
-			// Reset score
-			currentScore = 0;
-			ShowScore ();
+				if (g.isGameOver()) {
+					ShowAlert();
+				}
+
+				return true;
+			});
 		}
 
-		private Point RandomTile()
+		private void ShowAlert()
 		{
-			int col = random.Next(0, 8);
-			int row = random.Next(0, 8);
-
-			//Assert.IsTrue(col >= 0 && col < 8);
-			//Assert.IsTrue(row >= 0 && row < 8);
-
-			Point coords = new Point (col, row);
-
-			return coords;
+			UIAlertView alert = new UIAlertView();
+			alert.Title = "Bang!";
+			alert.AddButton("Ok");
+			alert.Message = "Game Over!";
+			alert.Show();
 		}
 
-		private void ShowScore()
+		private void ShowScore(MineSweeperGame g)
 		{
-			currentScoreLabel.Text = currentScore.ToString ();
+			currentScoreLabel.Text = g.GetCurrentScore().ToString ();
 			highScoreLabel.Text = highScore.ToString ();
 		}
-
-		private int CalculateTileNumber(int col, int row) {
-			int value = 0;
-
-			// upper left
-			if (col > 0 && row > 0) {
-				if (tileState [col - 1, row - 1] == MINE) {
-					value++;
-				}
-			}
-
-			// above
-			if (row > 0) {
-				if (tileState [col, row - 1] == MINE) {
-					value++;
-				}
-			}
-
-			// upper right
-			if (col < 7 && row > 0) {
-				if (tileState [col + 1, row - 1] == MINE) {
-					value++;
-				}
-			}
-
-			// left
-			if (col > 0) {
-				if (tileState [col - 1, row] == MINE) {
-					value++;
-				}
-			}
-
-			// right
-			if (col < 7) {
-				if (tileState [col + 1, row] == MINE) {
-					value++;
-				}
-			}
-
-			// lower left
-			if (col > 0 && row < 7) {
-				if (tileState [col - 1, row + 1] == MINE) {
-					value++;
-				}
-			}
-
-			// below
-			if (row < 7) {
-				if (tileState [col, row + 1] == MINE) {
-					value++;
-				}
-			}
-
-			// lower right
-			if (col < 7 && row < 7) {
-				if (tileState [col + 1, row + 1] == MINE) {
-					value++;
-				}
-			}
-
-			return value;
+			
+		private int TagForTile(int col, int row)
+		{
+			return ((col << 8) + row);
 		}
 
-		private void UncoverTile(int col, int row) {
+		private Point TileForTag(int tag)
+		{
+			int col = (tag & 0xFF00) >> 8;
+			int row = tag & 0xFF;
 
-
+			return new Point (col, row);
 		}
-
 	}
 }
 

@@ -7,6 +7,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MinesweeperViewController">
             <connections>
                 <outlet property="currentScoreLabel" destination="j2b-S1-Iv4" id="j6C-7N-cPd"/>
+                <outlet property="flagImage" destination="a1n-Pf-y9T" id="EIa-j5-GHQ"/>
                 <outlet property="highScoreLabel" destination="N96-mK-69F" id="wT1-2e-6oh"/>
                 <outlet property="view" destination="6" id="7"/>
             </connections>
@@ -46,6 +47,10 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="a1n-Pf-y9T">
+                    <rect key="frame" x="269" y="46" width="31" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
