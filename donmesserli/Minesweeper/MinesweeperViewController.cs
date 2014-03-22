@@ -284,6 +284,8 @@ namespace Minesweeper
 			//	StartGame ();
 			//};
 			alert.Show();
+
+			// TODO: Update view to start over
 		}
 
 		private void ShowScore(MineSweeperGame g)
