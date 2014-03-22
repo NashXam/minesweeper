@@ -184,6 +184,8 @@ namespace Minesweeper
 			alert.AddButton("Ok");
 			alert.Message = "Game Over!";
 			alert.Show();
+
+			// TODO: Update view to start over
 		}
 
 		private void ShowScore(MineSweeperGame g)
