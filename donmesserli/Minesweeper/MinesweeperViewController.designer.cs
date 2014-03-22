@@ -20,22 +20,30 @@ namespace Minesweeper
 
 		[Outlet]
 		MonoTouch.UIKit.UILabel highScoreLabel { get; set; }
+
+		[Outlet]
+		MonoTouch.UIKit.UILabel newGameLabel { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (flagImage != null) {
-				flagImage.Dispose ();
-				flagImage = null;
-			}
-
 			if (currentScoreLabel != null) {
 				currentScoreLabel.Dispose ();
 				currentScoreLabel = null;
 			}
 
+			if (flagImage != null) {
+				flagImage.Dispose ();
+				flagImage = null;
+			}
+
 			if (highScoreLabel != null) {
 				highScoreLabel.Dispose ();
 				highScoreLabel = null;
+			}
+
+			if (newGameLabel != null) {
+				newGameLabel.Dispose ();
+				newGameLabel = null;
 			}
 		}
 	}

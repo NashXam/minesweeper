@@ -24,6 +24,8 @@ namespace Minesweeper
 		//
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
+			UIApplication.SharedApplication.ApplicationSupportsShakeToEdit = true;
+
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
 			
 			viewController = new MinesweeperViewController ();

@@ -3,11 +3,19 @@ using System.Drawing;
 using System.Timers;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using PerpetualEngine.Storage;
+using SysSound.Extensions;
+using MonoTouch.AudioToolbox;
 
 namespace Minesweeper
 {
 	public partial class MinesweeperViewController : UIViewController
 	{
+		// To turn cheating on, flag and unflag a tile 3 times each
+		private int cheatCounter = 0;
+		private int lastFlagged = 0xFFFF;
+		private bool cheating = true;
+
 		private static int NUMROWS = 8;
 		private static int NUMCOLS = 8;
 
@@ -18,23 +26,35 @@ namespace Minesweeper
 
 		private static int NUMMINES = 10;
 
+		// SHORT PRESS (TAP) to uncover tile.
+		// LONG PRESS tp place flag;
 		private static int SHORTPRESS = 0;
 		private static int LONGPRESS = 1;
+
+		private SimpleStorage preferences = SimpleStorage.EditGroup("Minesweeper");
+		private static string HIGHSCOREKEY = "highscore";
 
 		private MineSweeperGame game;
 		private Timer pressTimer;
 		private int pressType;
-		private int pressTag;
+		private int pressedTag;
+		private	bool gameOver;
+
+		private SystemSound bombSound;
+		private SystemSound winSound;
 
 		private int highScore = 0;
 
-		private UIButton[,] tile = new UIButton[NUMCOLS, NUMROWS];
+		private UIButton[,] tiles = new UIButton[NUMCOLS, NUMROWS];
 
 		private UIImage blankTile;
 		private UIImage mineTile;
 		private UIImage flag;
 		private UIImage coveredTile;
 		private UIImage flaggedTile;
+		private UIImage cheatTile;
+		private UIImage redmineTile;
+		private UIImage flaggedCheatTile;
 		private UIImage[] numberTiles = new UIImage[9];
 
 		public MinesweeperViewController () : base ("MinesweeperViewController", null)
@@ -53,11 +73,22 @@ namespace Minesweeper
 		{
 			base.ViewDidLoad ();
 
+			//enable audio
+			AudioSession.Initialize();
+
+			bombSound = SystemSound.FromFile("Bomb.wav");
+			winSound = SystemSound.FromFile("success.wav");
+
+			highScore = Convert.ToInt32(preferences.Get(HIGHSCOREKEY) ?? "0");
+
 			blankTile = UIImage.FromBundle ("tile.png");
-			mineTile = UIImage.FromBundle ("bomb.png");
+			mineTile = UIImage.FromBundle ("mine.png");
 			flag = UIImage.FromBundle ("flag.png");
 			coveredTile = UIImage.FromBundle ("covered.png");
 			flaggedTile = UIImage.FromBundle ("flagged.png");
+			cheatTile = UIImage.FromBundle ("cheat.png");
+			redmineTile = UIImage.FromBundle ("redmine.png");
+			flaggedCheatTile = UIImage.FromBundle ("flaggedcheat.png");
 
 			numberTiles[0] = UIImage.FromBundle ("blank.png");
 			numberTiles[1] = UIImage.FromBundle ("one.png");
@@ -74,29 +105,33 @@ namespace Minesweeper
 					var frame = new RectangleF (STARTX + (col * (TILESIZE + GAPSIZE)), STARTY + (row * (TILESIZE + GAPSIZE)), TILESIZE, TILESIZE);
 					UIButton iv = UIButton.FromType(UIButtonType.Custom);
 					iv.Frame = frame;
-					tile [col, row] = iv;
-					//tile [col, row].Image = mineTile;
+					tiles [col, row] = iv;
 					iv.BackgroundColor = UIColor.White;
 					View.Add (iv);
 					iv.UserInteractionEnabled = true;
 					iv.Tag = TagForTile (col, row);
 
 					iv.TouchDown += (sender, ea) => {
-						pressTag = ((UIButton)sender).Tag;
-						flagImage.Image = flag;
-						pressTimer = new Timer(400);
-						pressTimer.Elapsed += OnTimerElapsed;
-						pressTimer.Start ();
-						pressType = SHORTPRESS;
+						if (!gameOver) {
+							pressedTag = ((UIButton)sender).Tag;
+							pressTimer = new Timer(400);
+							pressTimer.Elapsed += OnTimerElapsed;
+							pressTimer.Start ();
+							pressType = SHORTPRESS;
+						}
 					};
 
 					iv.TouchUpInside += (sender, ea) => {
-						InvokeOnMainThread (() => flagImage.Image = blankTile);
-						if (pressTimer != null) {
-							pressTimer.Close();
-							pressTimer.Dispose();
+						if (gameOver) {
+							StartGame ();
+						} else {
+							InvokeOnMainThread (() => flagImage.Image = blankTile);
+							if (pressTimer != null) {
+								pressTimer.Close();
+								pressTimer.Dispose();
+							}
+							HandlePress();
 						}
-						HandlePress();
 					};
 
 					//iv.TouchesCancelled += (sender, ea) => {
@@ -104,10 +139,14 @@ namespace Minesweeper
 					//};
 
 					iv.TouchUpOutside += (sender, ea) => {
-						InvokeOnMainThread (() => flagImage.Image = blankTile);
-						if (pressTimer != null) {
-							pressTimer.Close();
-							pressTimer.Dispose();
+						if (gameOver) {
+							StartGame ();
+						} else {
+							InvokeOnMainThread (() => flagImage.Image = blankTile);
+							if (pressTimer != null) {
+								pressTimer.Close();
+								pressTimer.Dispose();
+							}
 						}
 					};
 
@@ -120,7 +159,7 @@ namespace Minesweeper
 			
 		private void OnTimerElapsed (object o, EventArgs e)
 		{
-			InvokeOnMainThread (() => flagImage.Image = blankTile);
+			InvokeOnMainThread (() => flagImage.Image = flag);
 			pressType = LONGPRESS;
 			pressTimer.Close();
 			pressTimer.Dispose();
@@ -129,66 +168,133 @@ namespace Minesweeper
 
 		private void HandlePress()
 		{
+			Point p = TileForTag (pressedTag);
+
 			if (pressType == SHORTPRESS) {
-				Point p = TileForTag (pressTag);
-				game.FlagTile (p.X, p.Y);
-			} else { // LONGPRESS
-				Point p = TileForTag (pressTag);
+				// Reset cheating state
+				cheatCounter = 0;
 				game.UncoverTile (p.X, p.Y);
+			} else { // LONGPRESS
+				// Figure out cheating state
+				if (lastFlagged == pressedTag) {
+					cheatCounter++;
+					if (cheatCounter == 6) {
+						cheating = !cheating;
+						cheatCounter = 0;
+					}
+				} else {
+					// Reset cheating state
+					cheatCounter = 0;
+				}
+
+				lastFlagged = pressedTag;
+				game.FlagTile (p.X, p.Y);
 			}
 		}
 
 		private void StartGame()
 		{
+			gameOver = false;
+			newGameLabel.Hidden = true;
+
 			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, (MineSweeperGame g) => {
+
+				Point p = TileForTag (pressedTag);
+				UIButton lastPressed = tiles [p.X, p.Y];
+
+				if (g.isGameOver()) {
+					gameOver = true;
+					newGameLabel.Hidden = false;
+					if (g.wasGameWon ()) {
+						winSound.PlaySystemSound ();
+					} else {
+						bombSound.PlaySystemSound ();
+					}
+					//ShowAlert ();
+				}
+
 				ShowScore(g);
 
 				for (int col = 0; col < NUMCOLS; col++) {
 					for (int row = 0; row < NUMROWS; row++) {
+						UIButton tile = tiles [col, row];
+						Console.WriteLine("Tile = {0:X} LastPressed = {1:X}", tile, lastPressed);
 						int value = g.GetTileValue(col, row);
 
 						MineSweeperGame.DrawType draw = g.GetDrawType(col, row);
 
 						switch (draw) {
 						case MineSweeperGame.DrawType.Covered:
-							tile [col, row].SetImage(coveredTile, UIControlState.Normal);
+							if (cheating  || gameOver) {
+								if (value == 0xFFFF) {
+									if (cheating && !gameOver) {
+										tile.SetImage(cheatTile, UIControlState.Normal);
+									} else {
+										tile.SetImage(mineTile, UIControlState.Normal);
+									}
+								} else {
+									tile.SetImage(coveredTile, UIControlState.Normal);
+								}
+							} else {
+								tile.SetImage(coveredTile, UIControlState.Normal);
+							}
 							break;
 
 						case MineSweeperGame.DrawType.Flagged:
-							tile [col, row].SetImage(flaggedTile, UIControlState.Normal);
+							if (cheating && value == 0xFFFF) {
+								tile.SetImage(flaggedCheatTile, UIControlState.Normal);
+							} else {
+								tile.SetImage(flaggedTile, UIControlState.Normal);
+							}
 							break;
 
 						case MineSweeperGame.DrawType.Value:
-							tile [col, row].SetImage(numberTiles [value], UIControlState.Normal);
+							tile.SetImage(numberTiles [value], UIControlState.Normal);
 							break;
 
 						case MineSweeperGame.DrawType.Mine:
-							tile [col, row].SetImage(mineTile, UIControlState.Normal);
+							if (gameOver && tile == lastPressed) {
+								tile.SetImage(redmineTile, UIControlState.Normal);
+							} else {
+								tile.SetImage(mineTile, UIControlState.Normal);
+							}
 							break;
 						}
 					}
 				}
 
-				if (g.isGameOver()) {
-					ShowAlert();
-				}
-
 				return true;
 			});
 		}
-
+			
 		private void ShowAlert()
 		{
 			UIAlertView alert = new UIAlertView();
-			alert.Title = "Bang!";
-			alert.AddButton("Ok");
-			alert.Message = "Game Over!";
+			if (game.wasGameWon ()) {
+				alert.Title = "Congratulations!";
+				alert.Message = "You won!";
+			} else {
+				alert.Title = "Bang!";
+				alert.Message = "Game Over!";
+			}
+
+			alert.AddButton("OK");
+
+			//alert.Clicked += (s, b) => {
+			//	StartGame ();
+			//};
 			alert.Show();
 		}
 
 		private void ShowScore(MineSweeperGame g)
 		{
-			currentScoreLabel.Text = g.GetCurrentScore().ToString ();
+			int currentScore = g.GetCurrentScore ();
+			if (currentScore > highScore) {
+				highScore = currentScore;
+				preferences.Put(HIGHSCOREKEY, highScore.ToString());
+			}
+
+			currentScoreLabel.Text = currentScore.ToString ();
 			highScoreLabel.Text = highScore.ToString ();
 		}
 			
@@ -204,6 +310,34 @@ namespace Minesweeper
 
 			return new Point (col, row);
 		}
+
+		#region respond to shaking (OS3+)
+		public override bool CanBecomeFirstResponder {
+			get {
+				return true;
+			}
+		}
+
+		public override void ViewDidAppear (bool animated)
+		{
+			base.ViewDidAppear (animated);
+			this.BecomeFirstResponder();
+		}
+
+		public override void ViewWillDisappear (bool animated)
+		{
+			this.ResignFirstResponder();
+			base.ViewWillDisappear (animated);
+		}
+
+		public override void MotionEnded (UIEventSubtype motion, UIEvent evt)
+		{
+			if (motion ==  UIEventSubtype.MotionShake)
+			{
+				StartGame();   
+			}
+		}
+		#endregion
 	}
 }
 

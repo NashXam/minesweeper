@@ -19,9 +19,14 @@ namespace Minesweeper
 		public delegate void DrawTiles();
 		private Func<MineSweeperGame,bool> drawer;
 		private bool gameOver;
+		private bool gameWon;
+		private int columns, rows;
 
 		public MineSweeperGame (int columns, int rows, int mines, Func<MineSweeperGame,bool> adrawer)
 		{
+			this.columns = columns;
+			this.rows = rows;
+
 			drawer = adrawer;
 			tiles = new Tile[columns, rows];
 
@@ -65,6 +70,11 @@ namespace Minesweeper
 		public bool isGameOver()
 		{
 			return gameOver;
+		}
+
+		public bool wasGameWon()
+		{
+			return gameWon;
 		}
 
 		public DrawType GetDrawType(int col, int row) {
@@ -112,16 +122,40 @@ namespace Minesweeper
 		{
 			Tile tile = tiles [col, row];
 
-			if (tile.isCovered()) {
+			if (tile.isCovered() || tile.isFlagged()) {
 				tile.Uncover();
+
 				if (tile.isMine()) {
 					gameOver = true;
 				} else {
 					DoUncover (tile);
 				}
 
+				if (CheckForWin ())
+					gameOver = true;
+
 				drawer (this);
 			}
+		}
+
+		// NOTE: All tiles except for mines must be uncovered
+		private bool CheckForWin()
+		{
+			bool bWon = true;
+
+			for (int col = 0; col < columns; col++) {
+				for (int row = 0; row < rows; row++) {
+					Tile tile = tiles [col, row];
+
+					if (!tile.isMine() && !tile.isUncovered()) {
+						bWon = false;
+						break;
+					}
+				}
+			}
+
+			gameWon = bWon;
+			return bWon;
 		}
 
 		private enum Neighbors {
@@ -214,8 +248,10 @@ namespace Minesweeper
 				return;
 			}
 
-			// Score 1 for this tile
-			currentScore++;
+			// Score 1 for this tile if it has a value of 0
+			if (tile.Value == 0) {
+				currentScore++;
+			}
 
 			// upper left			 
 			DoNeighbor(tile, Neighbors.UpperLeft);
@@ -233,7 +269,7 @@ namespace Minesweeper
 			DoNeighbor(tile, Neighbors.Right);
 
 			// lower left
-			DoNeighbor(tile, Neighbors.UpperLeft);
+			DoNeighbor(tile, Neighbors.LowerLeft);
 
 			// below
 			DoNeighbor(tile, Neighbors.Below);
@@ -351,6 +387,10 @@ namespace Minesweeper
 
 			public bool isCovered() {
 				return (state == TileStateCovered);
+			}
+
+			public bool isUncovered() {
+				return (state == TileStateUncovered);
 			}
 
 			public bool isFlagged() {

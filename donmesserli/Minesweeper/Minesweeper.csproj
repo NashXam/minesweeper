@@ -90,27 +90,33 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
+    <Reference Include="SimpleStorage.iOS">
+      <HintPath>Components\simple-storage-1.2\lib\ios\SimpleStorage.iOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\Default-568h%402x.png" />
-    <BundleResource Include="Resources\tile.png" />
-    <BundleResource Include="Resources\bomb.png" />
-    <BundleResource Include="Resources\one.png" />
+    <BundleResource Include="Info.plist" />
     <BundleResource Include="Resources\blank.png" />
-    <BundleResource Include="Resources\two.png" />
+    <BundleResource Include="Resources\Bomb.wav" />
+    <BundleResource Include="Resources\cheat.png" />
+    <BundleResource Include="Resources\covered.jpeg" />
+    <BundleResource Include="Resources\covered.png" />
+    <BundleResource Include="Resources\Default-568h%402x.png" />
     <BundleResource Include="Resources\eight.png" />
+    <BundleResource Include="Resources\five.png" />
+    <BundleResource Include="Resources\flag.png" />
+    <BundleResource Include="Resources\flagged.png" />
+    <BundleResource Include="Resources\flaggedcheat.png" />
+    <BundleResource Include="Resources\four.png" />
+    <BundleResource Include="Resources\mine.png" />
+    <BundleResource Include="Resources\one.png" />
+    <BundleResource Include="Resources\redmine.png" />
     <BundleResource Include="Resources\seven.png" />
     <BundleResource Include="Resources\six.png" />
-    <BundleResource Include="Resources\five.png" />
-    <BundleResource Include="Resources\four.png" />
+    <BundleResource Include="Resources\success.wav" />
     <BundleResource Include="Resources\three.png" />
-    <BundleResource Include="Resources\flag.png" />
-    <BundleResource Include="Resources\covered.png" />
-    <BundleResource Include="Resources\flagged.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="Entitlements.plist" />
+    <BundleResource Include="Resources\tile.png" />
+    <BundleResource Include="Resources\two.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -120,9 +126,17 @@
       <DependentUpon>MinesweeperViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="MineSweeperGame.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <InterfaceDefinition Include="MinesweeperViewController.xib" />
+    <Compile Include="Extensions\NSBundleExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <XamarinComponentReference Include="simple-storage">
+      <Version>1.2</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
 </Project>
