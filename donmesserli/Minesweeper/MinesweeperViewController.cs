@@ -14,7 +14,7 @@ namespace Minesweeper
 		// To turn cheating on, flag and unflag a tile 3 times each
 		private int cheatCounter = 0;
 		private int lastFlagged = 0xFFFF;
-		private bool cheating = true;
+		private bool cheating = false;
 
 		private static int NUMROWS = 8;
 		private static int NUMCOLS = 8;
@@ -55,6 +55,8 @@ namespace Minesweeper
 		private UIImage cheatTile;
 		private UIImage redmineTile;
 		private UIImage flaggedCheatTile;
+		private UIImage questionTile;
+		private UIImage questionCheatTile;
 		private UIImage[] numberTiles = new UIImage[9];
 
 		public MinesweeperViewController () : base ("MinesweeperViewController", null)
@@ -89,6 +91,8 @@ namespace Minesweeper
 			cheatTile = UIImage.FromBundle ("cheat.png");
 			redmineTile = UIImage.FromBundle ("redmine.png");
 			flaggedCheatTile = UIImage.FromBundle ("flaggedcheat.png");
+			questionTile = UIImage.FromBundle ("question.png");
+			questionCheatTile = UIImage.FromBundle ("questioncheat.png");
 
 			numberTiles[0] = UIImage.FromBundle ("blank.png");
 			numberTiles[1] = UIImage.FromBundle ("one.png");
@@ -176,15 +180,17 @@ namespace Minesweeper
 				game.UncoverTile (p.X, p.Y);
 			} else { // LONGPRESS
 				// Figure out cheating state
-				if (lastFlagged == pressedTag) {
+				if (lastFlagged == pressedTag || lastFlagged == 0xFFFF) {
 					cheatCounter++;
 					if (cheatCounter == 6) {
 						cheating = !cheating;
 						cheatCounter = 0;
+						lastFlagged = 0xFFFF;
 					}
 				} else {
 					// Reset cheating state
 					cheatCounter = 0;
+					lastFlagged = 0xFFFF;
 				}
 
 				lastFlagged = pressedTag;
@@ -245,6 +251,14 @@ namespace Minesweeper
 								tile.SetImage(flaggedCheatTile, UIControlState.Normal);
 							} else {
 								tile.SetImage(flaggedTile, UIControlState.Normal);
+							}
+							break;
+
+						case MineSweeperGame.DrawType.Questioned:
+							if (cheating && value == 0xFFFF) {
+								tile.SetImage(questionCheatTile, UIControlState.Normal);
+							} else {
+								tile.SetImage(questionTile, UIControlState.Normal);
 							}
 							break;
 

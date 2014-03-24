@@ -117,6 +117,9 @@
     <BundleResource Include="Resources\three.png" />
     <BundleResource Include="Resources\tile.png" />
     <BundleResource Include="Resources\two.png" />
+    <BundleResource Include="Resources\questioncheat.png" />
+    <BundleResource Include="Resources\question.png" />
+    <BundleResource Include="Resources\question2.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -138,5 +141,8 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MinesweeperViewController.xib" />
   </ItemGroup>
 </Project>

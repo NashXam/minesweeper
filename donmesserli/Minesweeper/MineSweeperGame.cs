@@ -8,6 +8,7 @@ namespace Minesweeper
 		public enum DrawType {
 			Covered,
 			Flagged,
+			Questioned,
 			Value,
 			Mine
 		};
@@ -86,6 +87,8 @@ namespace Minesweeper
 				draw = DrawType.Flagged;
 			} else if (tile.isCovered ()) {
 				draw = DrawType.Covered;
+			} else if (tile.isQuestioned ()) {
+				draw = DrawType.Questioned;
 			} else { // uncovered
 				if (tile.isMine ()) {
 					draw = DrawType.Mine;
@@ -109,11 +112,14 @@ namespace Minesweeper
 
 		public void FlagTile(int col, int row)
 		{
-			if (tiles [col, row].isCovered()) {
-				tiles [col, row].Flag();
+			if (tiles [col, row].isCovered ()) {
+				tiles [col, row].Flag ();
 				drawer (this);
-			} else if (tiles [col, row].isFlagged()) {
-				tiles [col, row].Unflag();
+			} else if (tiles [col, row].isFlagged ()) {
+				tiles [col, row].Question ();
+				drawer (this);
+			} else if (tiles [col, row].isQuestioned ()) {
+				tiles [col, row].Flag ();
 				drawer (this);
 			}
 		}
@@ -122,7 +128,7 @@ namespace Minesweeper
 		{
 			Tile tile = tiles [col, row];
 
-			if (tile.isCovered() || tile.isFlagged()) {
+			if (tile.isCovered() || tile.isQuestioned () ) {
 				tile.Uncover();
 
 				if (tile.isMine()) {
@@ -364,19 +370,22 @@ namespace Minesweeper
 
 		private class Tile
 		{
-			private static int TileStateCovered = 0;
-			private static int TileStateFlagged = 1;	// also covered
-			private static int TileStateUncovered = 2;
-
+			private enum TileState {
+				Flagged,
+				Covered,
+				Questioned,
+				Uncovered
+			};
+				
 			private  static int TileValueMine = 0xFFFF;
 
 			public Tile(int c, int r) {
 				col = c;
 				row = r;
-				state = TileStateCovered;
+				state = TileState.Covered;
 			}
 
-			private int state;
+			private TileState state;
 			private int value { get; set; }
 			public int col;
 			public int row;
@@ -386,29 +395,37 @@ namespace Minesweeper
 			}
 
 			public bool isCovered() {
-				return (state == TileStateCovered);
+				return (state == TileState.Covered);
 			}
 
 			public bool isUncovered() {
-				return (state == TileStateUncovered);
+				return (state == TileState.Uncovered);
 			}
 
 			public bool isFlagged() {
-				return (state == TileStateFlagged);
+				return (state == TileState.Flagged);
+			}
+
+			public bool isQuestioned() {
+				return (state == TileState.Questioned);
 			}
 
 			public void Flag() {
-				state = TileStateFlagged;
+				state = TileState.Flagged;
 			}
 
 			public void Unflag() {
-				state = TileStateCovered;
+				state = TileState.Covered;
 			}
 
 			public void Uncover() {
-				state = TileStateUncovered;
+				state = TileState.Uncovered;
 			}
-					
+
+			public void Question() {
+				state = TileState.Questioned;
+			}
+
 			public void PlaceMine() {
 				value = TileValueMine;
 			}
