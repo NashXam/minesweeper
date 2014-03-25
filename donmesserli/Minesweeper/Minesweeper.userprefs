@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.1" />
   <MonoDevelop.Ide.Workbench ActiveDocument="MinesweeperViewController.cs">
     <Files>
-      <File FileName="MinesweeperViewController.cs" Line="246" Column="3" />
+      <File FileName="MinesweeperViewController.cs" Line="249" Column="1" />
       <File FileName="MineSweeperGame.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>

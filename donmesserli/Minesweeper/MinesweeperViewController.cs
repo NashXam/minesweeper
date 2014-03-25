@@ -157,7 +157,6 @@ namespace Minesweeper
 				}		 
 			}
 
-			// (UIGestureRecognizer r, UITouch t, Object o) 
 			StartGame (); 
 		}
 			
@@ -210,13 +209,13 @@ namespace Minesweeper
 
 				if (g.isGameOver()) {
 					gameOver = true;
+					cheating = false;
 					newGameLabel.Hidden = false;
 					if (g.wasGameWon ()) {
 						winSound.PlaySystemSound ();
 					} else {
 						bombSound.PlaySystemSound ();
 					}
-					//ShowAlert ();
 				}
 
 				ShowScore(g);
@@ -224,7 +223,7 @@ namespace Minesweeper
 				for (int col = 0; col < NUMCOLS; col++) {
 					for (int row = 0; row < NUMROWS; row++) {
 						UIButton tile = tiles [col, row];
-						Console.WriteLine("Tile = {0:X} LastPressed = {1:X}", tile, lastPressed);
+						//Console.WriteLine("Tile = {0:X} LastPressed = {1:X}", tile, lastPressed);
 						int value = g.GetTileValue(col, row);
 
 						MineSweeperGame.DrawType draw = g.GetDrawType(col, row);
@@ -249,6 +248,8 @@ namespace Minesweeper
 						case MineSweeperGame.DrawType.Flagged:
 							if (cheating && value == 0xFFFF) {
 								tile.SetImage(flaggedCheatTile, UIControlState.Normal);
+							} else if (gameOver && value == 0xFFFF) {
+								tile.SetImage(mineTile, UIControlState.Normal);
 							} else {
 								tile.SetImage(flaggedTile, UIControlState.Normal);
 							}
