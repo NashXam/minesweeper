@@ -22,11 +22,14 @@ namespace Minesweeper
 		private bool gameOver;
 		private bool gameWon;
 		private int columns, rows;
+		private bool bDoQuestioned;
 
-		public MineSweeperGame (int columns, int rows, int mines, Func<MineSweeperGame,bool> adrawer)
+		public MineSweeperGame (int columns, int rows, int mines, bool bDoQuestioned, Func<MineSweeperGame,bool> adrawer)
 		{
 			this.columns = columns;
 			this.rows = rows;
+
+			this.bDoQuestioned = bDoQuestioned;
 
 			drawer = adrawer;
 			tiles = new Tile[columns, rows];
@@ -112,15 +115,25 @@ namespace Minesweeper
 
 		public void FlagTile(int col, int row)
 		{
-			if (tiles [col, row].isCovered ()) {
-				tiles [col, row].Flag ();
-				drawer (this);
-			} else if (tiles [col, row].isFlagged ()) {
-				tiles [col, row].Question ();
-				drawer (this);
-			} else if (tiles [col, row].isQuestioned ()) {
-				tiles [col, row].Flag ();
-				drawer (this);
+			if (bDoQuestioned) {
+				if (tiles [col, row].isCovered ()) {
+					tiles [col, row].Flag ();
+					drawer (this);
+				} else if (tiles [col, row].isFlagged ()) {
+					tiles [col, row].Question ();
+					drawer (this);
+				} else if (tiles [col, row].isQuestioned ()) {
+					tiles [col, row].Flag ();
+					drawer (this);
+				}
+			} else {
+				if (tiles [col, row].isCovered ()) {
+					tiles [col, row].Flag ();
+					drawer (this);
+				} else if (tiles [col, row].isFlagged ()) {
+					tiles [col, row].Unflag ();
+					drawer (this);
+				}
 			}
 		}
 
@@ -128,19 +141,31 @@ namespace Minesweeper
 		{
 			Tile tile = tiles [col, row];
 
-			if (tile.isCovered() || tile.isQuestioned () ) {
-				tile.Uncover();
-
-				if (tile.isMine()) {
-					gameOver = true;
-				} else {
-					DoUncover (tile);
-				}
-
-				if (CheckForWin ())
-					gameOver = true;
-
+			if (!bDoQuestioned && tile.isFlagged ()) {
+				tile.Unflag();
 				drawer (this);
+			}
+			else {
+				bool bSecondState;
+				if (bDoQuestioned) {
+					bSecondState = tile.isQuestioned ();
+				} else {
+					bSecondState = tile.isFlagged ();
+				}
+				if (tile.isCovered () || bSecondState) {
+					tile.Uncover ();
+
+					if (tile.isMine ()) {
+						gameOver = true;
+					} else {
+						DoUncover (tile);
+					}
+
+					if (CheckForWin ())
+						gameOver = true;
+
+					drawer (this);
+				}
 			}
 		}
 

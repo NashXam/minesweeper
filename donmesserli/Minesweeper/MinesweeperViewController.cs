@@ -11,6 +11,9 @@ namespace Minesweeper
 {
 	public partial class MinesweeperViewController : UIViewController
 	{
+		// Do we want to do the question mark thing like in real Minesweeper?
+		private bool bDoQuestioned = false;
+
 		// To turn cheating on, flag and unflag a tile 3 times each
 		private int cheatCounter = 0;
 		private int lastFlagged = 0xFFFF;
@@ -202,7 +205,7 @@ namespace Minesweeper
 			gameOver = false;
 			newGameLabel.Hidden = true;
 
-			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, (MineSweeperGame g) => {
+			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, bDoQuestioned, (MineSweeperGame g) => {
 
 				Point p = TileForTag (pressedTag);
 				UIButton lastPressed = tiles [p.X, p.Y];
