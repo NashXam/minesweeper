@@ -18,13 +18,13 @@ namespace Minesweeper
 		private Random random = new Random();
 
 		public delegate void DrawTiles();
-		private Func<MineSweeperGame,bool> drawer;
+		private Func<MineSweeperGame,bool,bool> drawer;
 		private bool gameOver;
 		private bool gameWon;
 		private int columns, rows;
 		private bool bDoQuestioned;
 
-		public MineSweeperGame (int columns, int rows, int mines, bool bDoQuestioned, Func<MineSweeperGame,bool> adrawer)
+		public MineSweeperGame (int columns, int rows, int mines, bool bDoQuestioned, Func<MineSweeperGame,bool,bool> adrawer)
 		{
 			this.columns = columns;
 			this.rows = rows;
@@ -68,7 +68,7 @@ namespace Minesweeper
 			// Reset score
 			currentScore = 0;
 
-			drawer (this);
+			drawer (this, false);
 		}
 
 		public bool isGameOver()
@@ -81,7 +81,13 @@ namespace Minesweeper
 			return gameWon;
 		}
 
-		public DrawType GetDrawType(int col, int row) {
+		public void ForceRedraw()
+		{
+			drawer (this, true);
+		}
+
+		public DrawType GetDrawType(int col, int row)
+		{
 			Tile tile = tiles [col, row];
 
 			DrawType draw = DrawType.Covered;
@@ -118,21 +124,21 @@ namespace Minesweeper
 			if (bDoQuestioned) {
 				if (tiles [col, row].isCovered ()) {
 					tiles [col, row].Flag ();
-					drawer (this);
+					drawer (this, false);
 				} else if (tiles [col, row].isFlagged ()) {
 					tiles [col, row].Question ();
-					drawer (this);
+					drawer (this, false);
 				} else if (tiles [col, row].isQuestioned ()) {
 					tiles [col, row].Flag ();
-					drawer (this);
+					drawer (this, false);
 				}
 			} else {
 				if (tiles [col, row].isCovered ()) {
 					tiles [col, row].Flag ();
-					drawer (this);
+					drawer (this, false);
 				} else if (tiles [col, row].isFlagged ()) {
 					tiles [col, row].Unflag ();
-					drawer (this);
+					drawer (this, false);
 				}
 			}
 		}
@@ -143,7 +149,7 @@ namespace Minesweeper
 
 			if (!bDoQuestioned && tile.isFlagged ()) {
 				tile.Unflag();
-				drawer (this);
+				drawer (this, false);
 			}
 			else {
 				bool bSecondState;
@@ -164,7 +170,7 @@ namespace Minesweeper
 					if (CheckForWin ())
 						gameOver = true;
 
-					drawer (this);
+					drawer (this, false);
 				}
 			}
 		}

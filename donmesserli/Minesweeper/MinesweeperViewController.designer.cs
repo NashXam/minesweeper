@@ -13,6 +13,9 @@ namespace Minesweeper
 	partial class MinesweeperViewController
 	{
 		[Outlet]
+		MonoTouch.UIKit.UIButton cheatButton { get; set; }
+
+		[Outlet]
 		MonoTouch.UIKit.UILabel currentScoreLabel { get; set; }
 
 		[Outlet]
@@ -39,6 +42,11 @@ namespace Minesweeper
 			if (highScoreLabel != null) {
 				highScoreLabel.Dispose ();
 				highScoreLabel = null;
+			}
+
+			if (cheatButton != null) {
+				cheatButton.Dispose ();
+				cheatButton = null;
 			}
 
 			if (newGameLabel != null) {

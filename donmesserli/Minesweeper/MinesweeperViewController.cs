@@ -60,6 +60,7 @@ namespace Minesweeper
 		private UIImage flaggedCheatTile;
 		private UIImage questionTile;
 		private UIImage questionCheatTile;
+		private UIImage cheatIcon;
 		private UIImage[] numberTiles = new UIImage[9];
 
 		public MinesweeperViewController () : base ("MinesweeperViewController", null)
@@ -96,6 +97,7 @@ namespace Minesweeper
 			flaggedCheatTile = UIImage.FromBundle ("flaggedcheat.png");
 			questionTile = UIImage.FromBundle ("question.png");
 			questionCheatTile = UIImage.FromBundle ("questioncheat.png");
+			cheatIcon = UIImage.FromBundle ("magnifying_glass_20.png");
 
 			numberTiles[0] = UIImage.FromBundle ("blank.png");
 			numberTiles[1] = UIImage.FromBundle ("one.png");
@@ -106,6 +108,23 @@ namespace Minesweeper
 			numberTiles[6] = UIImage.FromBundle ("six.png");
 			numberTiles[7] = UIImage.FromBundle ("seven.png");
 			numberTiles[8] = UIImage.FromBundle ("eight.png");
+
+			cheatButton.TouchDown += delegate {
+				cheating = true;
+				game.ForceRedraw ();
+			};
+
+			cheatButton.TouchUpInside += delegate {
+				cheating = false;
+				game.ForceRedraw ();
+			};
+
+			cheatButton.TouchUpOutside += delegate {
+				cheating = false;
+				game.ForceRedraw ();
+			};
+
+			cheatButton.SetImage(cheatIcon, UIControlState.Normal);
 
 			for (int col = 0; col < NUMCOLS; col++) {
 				for (int row = 0; row < NUMROWS; row++) {
@@ -205,12 +224,12 @@ namespace Minesweeper
 			gameOver = false;
 			newGameLabel.Hidden = true;
 
-			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, bDoQuestioned, (MineSweeperGame g) => {
+			game = new MineSweeperGame (NUMCOLS, NUMROWS, NUMMINES, bDoQuestioned, (MineSweeperGame g, bool forced) => {
 
 				Point p = TileForTag (pressedTag);
 				UIButton lastPressed = tiles [p.X, p.Y];
 
-				if (g.isGameOver()) {
+				if (!forced && g.isGameOver()) {
 					gameOver = true;
 					cheating = false;
 					newGameLabel.Hidden = false;

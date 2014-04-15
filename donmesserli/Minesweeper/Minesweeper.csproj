@@ -120,6 +120,7 @@
     <BundleResource Include="Resources\questioncheat.png" />
     <BundleResource Include="Resources\question.png" />
     <BundleResource Include="Resources\question2.png" />
+    <BundleResource Include="Resources\magnifying_glass_20.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
