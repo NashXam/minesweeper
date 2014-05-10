@@ -48,7 +48,7 @@ namespace Minesweeper.Android
 			public const int ab_white = 2130968577;
 			
 			// aapt resource value: 0x7f040003
-			public const int blue_background = 2130968579;
+			public const int brown_background = 2130968579;
 			
 			// aapt resource value: 0x7f040002
 			public const int green_background = 2130968578;
@@ -85,11 +85,20 @@ namespace Minesweeper.Android
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f070003
+			public const int currentScore = 2131165187;
+			
 			// aapt resource value: 0x7f070001
 			public const int gridLayout = 2131165185;
 			
+			// aapt resource value: 0x7f070004
+			public const int highScore = 2131165188;
+			
 			// aapt resource value: 0x7f070000
 			public const int mainLayout = 2131165184;
+			
+			// aapt resource value: 0x7f070002
+			public const int scores = 2131165186;
 			
 			static Id()
 			{
@@ -139,6 +148,9 @@ namespace Minesweeper.Android
 		public partial class Style
 		{
 			
+			// aapt resource value: 0x7f060003
+			public const int CommonText = 2131099651;
+			
 			// aapt resource value: 0x7f060000
 			public const int MyTheme = 2131099648;
 			
@@ -148,8 +160,11 @@ namespace Minesweeper.Android
 			// aapt resource value: 0x7f060002
 			public const int MyTheme_ActionBar_TitleTextStyle = 2131099650;
 			
-			// aapt resource value: 0x7f060003
-			public const int ThemeActionBar = 2131099651;
+			// aapt resource value: 0x7f060004
+			public const int ScoreText = 2131099652;
+			
+			// aapt resource value: 0x7f060005
+			public const int ThemeActionBar = 2131099653;
 			
 			static Style()
 			{

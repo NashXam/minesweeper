@@ -22,6 +22,18 @@
     <item name="android:textSize">20sp</item>
   </style>
 
+  <style name="CommonText">
+  	<item name="android:fontFamily">sans-serif-light</item>
+  	<item name="android:textSize">22sp</item>
+  	<item name="android:textColor">@color/white</item>
+  </style>
+
+  <style name="ScoreText" parent="@style/CommonText">
+  	<item name="android:textSize">32sp</item>
+  	<item name="android:layout_weight">1</item>
+  	<item name="android:gravity">center</item>
+  </style>
+
 	<style name="ThemeActionBar" parent="@android:style/Theme.Holo.Light">
 	</style>
 

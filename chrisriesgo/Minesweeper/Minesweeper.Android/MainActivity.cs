@@ -18,9 +18,11 @@ namespace Minesweeper.Android
 	{
 		List<Mine> _mines;
 		GridLayout _grid;
+		TextView _currentScore;
 		LinearLayout[] _subViews;
 		List<Tile> _checked;
 		int _size;
+		int _score = 0;
 
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -28,6 +30,7 @@ namespace Minesweeper.Android
 
 			SetContentView(Resource.Layout.Main);
 			_grid = FindViewById<GridLayout>(Resource.Id.gridLayout);
+			_currentScore = FindViewById<TextView>(Resource.Id.currentScore);
 			_size = 8;
 
 			NewGame(_size);
@@ -65,7 +68,7 @@ namespace Minesweeper.Android
 					for(var i = 0; i < tileCount; i++)
 					{
 						var tile = new LinearLayout(this);
-						tile.SetBackgroundColor(Color.LightGray);
+						tile.SetBackgroundColor(Resources.GetColor(Resource.Color.white));
 						var p = new GridLayout.LayoutParams() { Height = 112, Width = 112 };
 						p.SetMargins(4, 4, 4, 4);
 						tile.LayoutParameters = p;
@@ -106,7 +109,13 @@ namespace Minesweeper.Android
 			else
 			{
 				ShowTiles(tileLayout, tile);
+				UpdateScore();
 			}
+		}
+
+		void UpdateScore()
+		{
+			RunOnUiThread(() => _currentScore.Text = string.Format("{0}", ++_score));
 		}
 
 		void TileLongClick (object sender, View.LongClickEventArgs e)
@@ -159,15 +168,14 @@ namespace Minesweeper.Android
 			Flip(tileLayout);
 
 			var text = new TextView(this);
-			text.TextSize = 22;
-			text.TextAlignment = TextAlignment.Center;
+			text.SetTextAppearance(this, Resource.Style.CommonText);
 			text.Text = count.ToString();
 			tileLayout.AddView(text);
 		}
 
 		void Flip(LinearLayout tileLayout)
 		{
-			tileLayout.SetBackgroundColor(Color.LightSlateGray);
+			tileLayout.SetBackgroundColor(Resources.GetColor(Resource.Color.brown_background));
 			tileLayout.Click -= TileClick;
 		}
 
@@ -177,12 +185,12 @@ namespace Minesweeper.Android
 			if(tile.Flagged)
 			{
 				if (!_checked.Any(t => t.Position == tile.Position)) _checked.Add(tile);
-				layout.SetBackgroundColor(Color.White);
+				layout.SetBackgroundColor(Color.LightGray);
 			}
 			else
 			{
 				if (_checked.Any(t => t.Position == tile.Position)) _checked.Remove(_checked.First(t => t.Position == tile.Position));
-				layout.SetBackgroundColor(Color.LightGray);
+				layout.SetBackgroundColor(Resources.GetColor(Resource.Color.white));
 			}
 		}
 	}
