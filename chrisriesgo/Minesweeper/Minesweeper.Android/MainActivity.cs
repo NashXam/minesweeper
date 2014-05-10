@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Minesweeper.Android
 {
-	[Activity(Label = "Minesweeper", MainLauncher = true)]
+	[Activity (Label = "Minesweeper", MainLauncher = true, Theme = "@style/MyTheme")]
 	public class MainActivity : Activity
 	{
 		List<Mine> _mines;

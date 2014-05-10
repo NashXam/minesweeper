@@ -41,6 +41,31 @@ namespace Minesweeper.Android
 			}
 		}
 		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f040001
+			public const int ab_white = 2130968577;
+			
+			// aapt resource value: 0x7f040003
+			public const int blue_background = 2130968579;
+			
+			// aapt resource value: 0x7f040002
+			public const int green_background = 2130968578;
+			
+			// aapt resource value: 0x7f040000
+			public const int white = 2130968576;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
+			{
+			}
+		}
+		
 		public partial class Drawable
 		{
 			
@@ -60,11 +85,11 @@ namespace Minesweeper.Android
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f050001
-			public const int gridLayout = 2131034113;
+			// aapt resource value: 0x7f070001
+			public const int gridLayout = 2131165185;
 			
-			// aapt resource value: 0x7f050000
-			public const int mainLayout = 2131034112;
+			// aapt resource value: 0x7f070000
+			public const int mainLayout = 2131165184;
 			
 			static Id()
 			{
@@ -95,11 +120,11 @@ namespace Minesweeper.Android
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int app_name = 2130968577;
+			// aapt resource value: 0x7f050001
+			public const int app_name = 2131034113;
 			
-			// aapt resource value: 0x7f040000
-			public const int hello = 2130968576;
+			// aapt resource value: 0x7f050000
+			public const int hello = 2131034112;
 			
 			static String()
 			{
@@ -107,6 +132,31 @@ namespace Minesweeper.Android
 			}
 			
 			private String()
+			{
+			}
+		}
+		
+		public partial class Style
+		{
+			
+			// aapt resource value: 0x7f060000
+			public const int MyTheme = 2131099648;
+			
+			// aapt resource value: 0x7f060001
+			public const int MyTheme_ActionBar = 2131099649;
+			
+			// aapt resource value: 0x7f060002
+			public const int MyTheme_ActionBar_TitleTextStyle = 2131099650;
+			
+			// aapt resource value: 0x7f060003
+			public const int ThemeActionBar = 2131099651;
+			
+			static Style()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Style()
 			{
 			}
 		}
