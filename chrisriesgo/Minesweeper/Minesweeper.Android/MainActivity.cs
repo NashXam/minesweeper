@@ -101,10 +101,7 @@ namespace Minesweeper.Android
 			}
 			else
 			{
-				if(neighbors == 0)
-					ClearNeighbors(tileLayout, tile);
-				else
-					DisplayNeighborCount(tileLayout, neighbors);
+				ShowTiles(tileLayout, tile);
 			}
 		}
 
@@ -118,11 +115,16 @@ namespace Minesweeper.Android
 				_checked.Add(n.Position);
 				n.Neighbors = Helpers.CountNeighbors(_mines, n.X, n.Y);
 				var layout = _subViews[n.Position];
-				if(n.Neighbors == 0)
-					ClearNeighbors(layout, n);
-				else
-					DisplayNeighborCount(layout, n.Neighbors);
+				ShowTiles(layout, n);
 			}
+		}
+
+		void ShowTiles(LinearLayout layout, Tile tile)
+		{
+			if(tile.Neighbors == 0)
+				ClearNeighbors(layout, tile);
+			else
+				DisplayNeighborCount(layout, tile.Neighbors);
 		}
 
 		void DisplayNeighborCount(LinearLayout tileLayout, int count)
