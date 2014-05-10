@@ -19,7 +19,7 @@ namespace Minesweeper.Android
 		List<Mine> _mines;
 		GridLayout _grid;
 		LinearLayout[] _subViews;
-		List<int> _checked;
+		List<Tile> _checked;
 		int _size;
 
 		protected override void OnCreate(Bundle bundle)
@@ -40,7 +40,7 @@ namespace Minesweeper.Android
 			_grid.RowCount = size;
 			_mines = new List<Mine>();
 			_subViews = new LinearLayout[size * size];
-			_checked = new List<int>();
+			_checked = new List<Tile>();
 			for(int i = 0; i < size; i++)
 			{
 				int x;
@@ -72,6 +72,7 @@ namespace Minesweeper.Android
 						RunOnUiThread(() =>
 						{
 							tile.Click += TileClick;
+							tile.LongClick += TileLongClick;
 							_grid.AddView(tile);
 							_subViews[_grid.IndexOfChild(tile)] = tile;
 						});
@@ -95,7 +96,7 @@ namespace Minesweeper.Android
 			var neighbors = Helpers.CountNeighbors(_mines, column, row);
 
 			var tile = new Tile { X = column, Y = row, Neighbors = neighbors, Position = position };
-			_checked.Add(position);
+			_checked.Add(tile);
 
 			if(_mines.Exists(m => m.X == column && m.Y == row))
 			{
@@ -108,14 +109,37 @@ namespace Minesweeper.Android
 			}
 		}
 
+		void TileLongClick (object sender, View.LongClickEventArgs e)
+		{
+			// Set/Release flag
+			var tileLayout = (LinearLayout)sender;
+
+			var position = _grid.IndexOfChild(tileLayout);
+			var tile = _checked.FirstOrDefault(t => t.Position == position);
+			if(tile == null)
+			{
+				int numberOfColumns = _grid.ColumnCount;
+				int row = Convert.ToInt32(Math.Floor((double)(position/numberOfColumns)));
+				int column = position - (row * numberOfColumns);
+				var neighbors = Helpers.CountNeighbors(_mines, column, row);
+
+				tile = new Tile { X = column, Y = row, Neighbors = neighbors, Position = position };
+			}
+
+			tile.Flagged = !tile.Flagged;
+			//_checked.Where(t => t.Position == position).First() = tile;
+
+			SetFlag(tile);
+		}
+
 		void ClearNeighbors(LinearLayout tileLayout,Tile tile)
 		{
 			Flip(tileLayout);
 
 			foreach(var n in Helpers.Neighbors(tile, _size))
 			{
-				if(_checked.Contains(n.Position)) continue;
-				_checked.Add(n.Position);
+				if(_checked.Any(t => t.Position == n.Position)) continue;
+				_checked.Add(n);
 				n.Neighbors = Helpers.CountNeighbors(_mines, n.X, n.Y);
 				var layout = _subViews[n.Position];
 				ShowTiles(layout, n);
@@ -145,6 +169,21 @@ namespace Minesweeper.Android
 		{
 			tileLayout.SetBackgroundColor(Color.LightSlateGray);
 			tileLayout.Click -= TileClick;
+		}
+
+		void SetFlag(Tile tile)
+		{
+			var layout = _subViews[tile.Position];
+			if(tile.Flagged)
+			{
+				if (!_checked.Any(t => t.Position == tile.Position)) _checked.Add(tile);
+				layout.SetBackgroundColor(Color.White);
+			}
+			else
+			{
+				if (_checked.Any(t => t.Position == tile.Position)) _checked.Remove(_checked.First(t => t.Position == tile.Position));
+				layout.SetBackgroundColor(Color.LightGray);
+			}
 		}
 	}
 }

@@ -13,6 +13,8 @@ namespace Minesweeper.Core
 		public int Neighbors { get; set; }
 
 		public int Position { get; set; }
+
+		public bool Flagged { get; set; }
 	}
 }
 
