@@ -105,6 +105,13 @@ namespace Minesweeper.Android
 			{
 				// You lose :(
 				tileLayout.SetBackgroundColor(Color.Red);
+				foreach(var v in _subViews)
+				{
+					var p = _grid.IndexOfChild(v);
+					if(_checked.Any(t => t.Position == p)) continue;
+					v.Click -= TileClick;
+					v.LongClick -= TileLongClick;
+				}
 			}
 			else
 			{
