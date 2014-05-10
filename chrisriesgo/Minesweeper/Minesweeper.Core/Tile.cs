@@ -11,6 +11,8 @@ namespace Minesweeper.Core
 		public int Y { get; set; }
 
 		public int Neighbors { get; set; }
+
+		public int Position { get; set; }
 	}
 }
 
