@@ -184,6 +184,7 @@ namespace Minesweeper.Android
 		{
 			tileLayout.SetBackgroundColor(Resources.GetColor(Resource.Color.brown_background));
 			tileLayout.Click -= TileClick;
+			tileLayout.LongClick -= TileLongClick;
 		}
 
 		void SetFlag(Tile tile)
