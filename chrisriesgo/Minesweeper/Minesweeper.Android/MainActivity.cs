@@ -28,13 +28,16 @@ namespace Minesweeper.Android
 
 			SetContentView(Resource.Layout.Main);
 			_grid = FindViewById<GridLayout>(Resource.Id.gridLayout);
-			_size = 9;
+			_size = 8;
 
 			NewGame(_size);
 		}
 
 		async void NewGame(int size)
 		{
+
+			_grid.ColumnCount = size;
+			_grid.RowCount = size;
 			_mines = new List<Mine>();
 			_subViews = new LinearLayout[size * size];
 			_checked = new List<int>();
@@ -63,7 +66,7 @@ namespace Minesweeper.Android
 					{
 						var tile = new LinearLayout(this);
 						tile.SetBackgroundColor(Color.LightGray);
-						var p = new GridLayout.LayoutParams() { Height = 100, Width = 100 };
+						var p = new GridLayout.LayoutParams() { Height = 112, Width = 112 };
 						p.SetMargins(4, 4, 4, 4);
 						tile.LayoutParameters = p;
 						RunOnUiThread(() =>

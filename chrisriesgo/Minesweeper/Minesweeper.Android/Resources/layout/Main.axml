@@ -8,7 +8,5 @@
     <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/gridLayout"
-        android:rowCount="9"
-        android:columnCount="9" />
+        android:id="@+id/gridLayout" />
 </LinearLayout>
