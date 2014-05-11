@@ -18,12 +18,12 @@ namespace Minesweeper.Android
 	{
 		List<Mine> _mines;
 		GridLayout _grid;
-		TextView _currentScore;
+		TextView _currentScore, _highScoreTv;
 		Button _gameButton;
 		LinearLayout[] _subViews;
 		List<Tile> _checked;
 		int _size;
-		int _score = 0;
+		int _score = 0, _highScore = 0;
 
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -32,6 +32,7 @@ namespace Minesweeper.Android
 			SetContentView(Resource.Layout.Main);
 			_grid = FindViewById<GridLayout>(Resource.Id.gridLayout);
 			_currentScore = FindViewById<TextView>(Resource.Id.currentScore);
+			_highScoreTv = FindViewById<TextView>(Resource.Id.highScore);
 			_gameButton = FindViewById<Button>(Resource.Id.gameButton);
 			_gameButton.Click += NewGameClick;
 			_size = 8;
@@ -39,17 +40,23 @@ namespace Minesweeper.Android
 			NewGame(_size);
 		}
 
-		void Clear()
+		void Reset()
 		{
 			_grid.RemoveAllViews();
 			_mines = new List<Mine>();
 			_subViews = new LinearLayout[0];
 			_checked = new List<Tile>();
+			_score = _highScore = 0;
 			_currentScore.Text = "0";
+			_highScoreTv.Text = "0";
 		}
 
 		async void NewGame(int size)
 		{
+			// Preferences
+			var preferences = this.GetSharedPreferences(GetString(Resource.String.app_name), FileCreationMode.Private);
+			_highScore = preferences.GetInt(string.Format("HighScore_{0}", size), 0);
+			_highScoreTv.Text = _highScore.ToString();
 
 			_grid.ColumnCount = size;
 			_grid.RowCount = size;
@@ -102,7 +109,7 @@ namespace Minesweeper.Android
 
 		void NewGameClick (object sender, EventArgs e)
 		{
-			Clear();
+			Reset();
 			NewGame(_size);
 		}
 
@@ -141,6 +148,17 @@ namespace Minesweeper.Android
 		void UpdateScore()
 		{
 			RunOnUiThread(() => _currentScore.Text = string.Format("{0}", ++_score));
+
+			if(_score > _highScore)
+			{
+				var prefences = GetSharedPreferences(GetString(Resource.String.app_name), FileCreationMode.Private);
+				var editor = prefences.Edit();
+				editor.Remove(string.Format("HighScore_{0}", _size));
+				editor.PutInt(string.Format("HighScore_{0}", _size), _score);
+				editor.Commit();
+				_highScore = _score;
+				RunOnUiThread(() => _highScoreTv.Text = _highScore.ToString());
+			}
 		}
 
 		void TileLongClick (object sender, View.LongClickEventArgs e)
