@@ -138,6 +138,9 @@ namespace Minesweeper.Android
 			// aapt resource value: 0x7f050000
 			public const int hello = 2131034112;
 			
+			// aapt resource value: 0x7f050002
+			public const int new_game = 2131034114;
+			
 			static String()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();

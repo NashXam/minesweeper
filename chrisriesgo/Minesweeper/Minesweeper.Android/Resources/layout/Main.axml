@@ -29,7 +29,7 @@
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New\nGame" />
+            android:text="@string/new_game" />
         <TextView
             android:id="@+id/highScore"
             style="@style/ScoreText"

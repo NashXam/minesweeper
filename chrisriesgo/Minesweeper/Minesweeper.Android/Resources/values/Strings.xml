@@ -2,4 +2,5 @@
 <resources>
 	<string name="hello">Hello World, Click Me!</string>
 	<string name="app_name">Minesweeper.Android</string>
+	<string name="new_game">New\nGame</string>
 </resources>
