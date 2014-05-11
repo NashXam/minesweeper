@@ -19,6 +19,7 @@ namespace Minesweeper.Android
 		List<Mine> _mines;
 		GridLayout _grid;
 		TextView _currentScore;
+		Button _gameButton;
 		LinearLayout[] _subViews;
 		List<Tile> _checked;
 		int _size;
@@ -31,6 +32,8 @@ namespace Minesweeper.Android
 			SetContentView(Resource.Layout.Main);
 			_grid = FindViewById<GridLayout>(Resource.Id.gridLayout);
 			_currentScore = FindViewById<TextView>(Resource.Id.currentScore);
+			_gameButton = FindViewById<Button>(Resource.Id.gameButton);
+			_gameButton.Click += NewGameClick;
 			_size = 8;
 
 			NewGame(_size);
@@ -38,7 +41,7 @@ namespace Minesweeper.Android
 
 		void Clear()
 		{
-			_grid = new GridLayout(this);
+			_grid.RemoveAllViews();
 			_mines = new List<Mine>();
 			_subViews = new LinearLayout[0];
 			_checked = new List<Tile>();
@@ -95,6 +98,12 @@ namespace Minesweeper.Android
 					Console.WriteLine(ex);
 				}
 			});
+		}
+
+		void NewGameClick (object sender, EventArgs e)
+		{
+			Clear();
+			NewGame(_size);
 		}
 
 		void TileClick (object sender, EventArgs e)
