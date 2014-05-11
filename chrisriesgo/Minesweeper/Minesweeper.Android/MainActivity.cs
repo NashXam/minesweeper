@@ -10,6 +10,7 @@ using Android.Graphics;
 using Minesweeper.Core;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Graphics.Drawables;
 
 namespace Minesweeper.Android
 {
@@ -229,12 +230,15 @@ namespace Minesweeper.Android
 			if(tile.Flagged)
 			{
 				if (!_checked.Any(t => t.Position == tile.Position)) _checked.Add(tile);
-				layout.SetBackgroundColor(Color.LightGray);
+				var img = new ImageView(this);
+				img.SetImageResource(Resource.Drawable.flag);
+				layout.AddView(img);
 			}
 			else
 			{
 				if (_checked.Any(t => t.Position == tile.Position)) _checked.Remove(_checked.First(t => t.Position == tile.Position));
-				layout.SetBackgroundColor(Resources.GetColor(Resource.Color.white));
+				//layout.SetBackgroundColor(Resources.GetColor(Resource.Color.white));
+				layout.RemoveAllViews();
 			}
 		}
 	}
