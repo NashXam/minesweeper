@@ -36,6 +36,15 @@ namespace Minesweeper.Android
 			NewGame(_size);
 		}
 
+		void Clear()
+		{
+			_grid = new GridLayout(this);
+			_mines = new List<Mine>();
+			_subViews = new LinearLayout[0];
+			_checked = new List<Tile>();
+			_currentScore.Text = "0";
+		}
+
 		async void NewGame(int size)
 		{
 

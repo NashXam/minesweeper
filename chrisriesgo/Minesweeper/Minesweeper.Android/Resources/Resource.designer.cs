@@ -88,11 +88,14 @@ namespace Minesweeper.Android
 			// aapt resource value: 0x7f070003
 			public const int currentScore = 2131165187;
 			
+			// aapt resource value: 0x7f070004
+			public const int gameButton = 2131165188;
+			
 			// aapt resource value: 0x7f070001
 			public const int gridLayout = 2131165185;
 			
-			// aapt resource value: 0x7f070004
-			public const int highScore = 2131165188;
+			// aapt resource value: 0x7f070005
+			public const int highScore = 2131165189;
 			
 			// aapt resource value: 0x7f070000
 			public const int mainLayout = 2131165184;
