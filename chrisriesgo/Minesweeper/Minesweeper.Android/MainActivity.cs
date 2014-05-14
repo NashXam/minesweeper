@@ -11,11 +11,12 @@ using Minesweeper.Core;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Graphics.Drawables;
+using Android.Hardware;
 
 namespace Minesweeper.Android
 {
 	[Activity (Label = "Minesweeper", MainLauncher = true, Theme = "@style/MyTheme")]
-	public class MainActivity : Activity
+	public class MainActivity : Activity, ISensorEventListener
 	{
 		List<Mine> _mines;
 		GridLayout _grid;
@@ -239,6 +240,56 @@ namespace Minesweeper.Android
 				if (_checked.Any(t => t.Position == tile.Position)) _checked.Remove(_checked.First(t => t.Position == tile.Position));
 				//layout.SetBackgroundColor(Resources.GetColor(Resource.Color.white));
 				layout.RemoveAllViews();
+			}
+		}
+
+		public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
+		{
+		}
+
+		bool hasUpdated;
+		DateTime lastUpdate;
+		float last_x;
+		float last_y;
+		float last_z;
+
+		const int ShakeDetectionTimeLapse = 250;
+		const double ShakeThreshold = 800;
+
+		public void OnSensorChanged(SensorEvent e)
+		{
+			if (e.Sensor.Type == SensorType.Accelerometer)
+			{
+				float x = e.Values[0];
+				float y = e.Values[1];
+				float z = e.Values[2];
+
+				DateTime curTime = System.DateTime.Now;
+				if (hasUpdated == false)
+				{
+					hasUpdated = true;
+					lastUpdate = curTime;
+					last_x = x;
+					last_y = y;
+					last_z = z;
+				}
+				else
+				{
+					if ((curTime - lastUpdate).TotalMilliseconds > ShakeDetectionTimeLapse) {
+						float diffTime = (float)(curTime - lastUpdate).TotalMilliseconds;
+						lastUpdate = curTime;
+						float total = x + y + z - last_x - last_y - last_z;
+						float speed = Math.Abs(total) / diffTime * 10000;
+
+						if (speed > ShakeThreshold) {
+							Toast.MakeText(this, "shake detected w/ speed: " + speed, ToastLength.Short).Show();
+						}
+
+						last_x = x;
+						last_y = y;
+						last_z = z;
+					}
+				}
 			}
 		}
 	}
