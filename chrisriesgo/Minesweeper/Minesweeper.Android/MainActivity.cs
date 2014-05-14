@@ -216,6 +216,7 @@ namespace Minesweeper.Android
 			text.SetTextAppearance(this, Resource.Style.CommonText);
 			text.Text = count.ToString();
 			tileLayout.AddView(text);
+			tileLayout.SetGravity(GravityFlags.Center);
 		}
 
 		void Flip(LinearLayout tileLayout)
@@ -243,6 +244,7 @@ namespace Minesweeper.Android
 			}
 		}
 
+		#region ISensorEventListener
 		public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
 		{
 		}
@@ -292,6 +294,7 @@ namespace Minesweeper.Android
 				}
 			}
 		}
+		#endregion
 	}
 }
 
